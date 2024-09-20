@@ -52,3 +52,7 @@ After completing the setup, clone this repository or download the `raycaster.c` 
    ```bash
    raycaster.exe
    ```
+
+
+
+Note: If you are having trouble with OpenGL, checkout my tutorial [here](https://github.com/DaldeZoo/OpenGL-Tutorials)!
