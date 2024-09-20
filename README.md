@@ -1,10 +1,14 @@
 # 3D-Raycaster-Engine
 
 This is a 3D Raycaster Engine built in C using OpenGL.
-
-It features a split-screen view that showcases both the underlying 2D game mechanics and the 3D rendered environment, illustrating how 2D data is used to create a 3D experience.
+It features a split-screen view that showcases both the underlying 2D game mechanics and the 3D rendered environment, illustrating how 2D data is used to create a 3D world.
 
 ![Screenshot](https://github.com/user-attachments/assets/a62e1e2f-1d50-456c-b3d7-6f81388ea0dc)
+
+## Key Features
+- **3D Rendering**: Renders a 3D environment using raycasting techniques.
+- **OpenGL Integration**: Utilizes OpenGL for graphics rendering.
+- **Customizable**: Easily modify and extend the engine for various use cases.
 
 ## Installation
 
@@ -37,7 +41,7 @@ Follow these steps to set up the environment on your Windows machine:
    - Copy it to `C:\Windows\SysWOW64\` (for 64-bit systems) or `C:\Windows\System32\` (for 32-bit systems).
 
 ### 3. Compile and Run the Raycaster
-After completing the setup, compile and run the program:
+After completing the setup, clone this repository or download the `raycaster.c` file, then compile and run the program:
 
 - Open a terminal in the project directory and compile the program with:
    ```bash
