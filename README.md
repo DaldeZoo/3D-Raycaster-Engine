@@ -45,12 +45,16 @@ After completing the setup, clone this repository or download the `raycaster.c` 
 
 - Open a terminal in the project directory and compile the program with:
    ```bash
-   gcc -o raycaster raycaster.c -IC:\MinGW\include -LC:\MinGW\lib -lopengl32 -lglu32 -lglut32
+   gcc -g raycaster.c main.c -o raycaster -IC:\MinGW\include -LC:\MinGW\lib -lopengl32 -lglu32 -lglut32
    ```
 
 - Run the compiled executable with:
    ```bash
    raycaster.exe
+   ```
+   or
+   ```bash
+   ./raycaster
    ```
 
 

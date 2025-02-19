@@ -1,19 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/glut.h>
-#include <math.h>
-#define PI 3.1415926535
-#define DG 0.0174533 // 1 degree in radians (since OpenGL uses radians)
-
-#define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 512
-
-#define MAP_X 8
-#define MAP_Y 8
-#define BLOCK_SIZE 64
-// Note: Since the Window's dimensions are 1024x512 pixels and each block size is 64,
-// then we can have a total of 1024/64 = 16 blocks horizontally and 512/64 = 8 blocks
-// vertically (if we want to cover the whole screen).
+#include "raycaster.h"
 
 float px, py; // Player position (px, py)
 float p_angle, pdx, pdy; // Player angle, player change in x, and player change in y
@@ -32,11 +17,6 @@ int map[MAP_Y][MAP_X] = // 2D Map layout
 
 void drawMap2D()
 {
-    // Note: Integer coordinates ensure precise alignment with the pixel grid.
-    // Integer coordinates are clearer and more suitable for representing discrete
-    // pixel positions, ensuring clarity and precision in rendering
-    // tasks like drawing a map layout.
-
     int x, y; // Used to traverse the 2D map
     // These two represent the top left corner of every square (wall) we draw:
     int xi = 0;
@@ -49,7 +29,7 @@ void drawMap2D()
         {
             if (map[y][x] == 1) glColor3f(1,1,1);
             else glColor3f(0,0,0);
-    
+
             // Note: the +-1's are for making grid lines.
             glBegin(GL_QUADS);
                 glVertex2i(xi + 1, yi - 1);
@@ -67,11 +47,6 @@ void drawMap2D()
 
 void detectWallFront()
 {
-    // Detects walls and prevents player from going through them by simply adding/subtracting the player offset values pdx and pdy. 
-    // Recall in "buttons" function, we add/subtract, for example, px with pdx and py with pdy when 'w' is pressed.
-    // So, this function, if a wall was detected, would subtract pdx and pdy from px and py respectively, basically doing nothing
-    // ie not moving the player at all - px += pdx -> WALL! -> px -= pdx.
-
     int mapx = (int)(px + pdx/speed*25) / 64;
     int mapy = 8 - ((int)(py + pdy/speed*25) / 64) - 1;
     if ((mapx >= 0 && mapy >= 0) && (mapx < MAP_X && mapy < MAP_Y) && map[mapy][mapx] == 1)
@@ -82,16 +57,14 @@ void detectWallFront()
 }
 
 void detectWallBack()
-{    
-    // Works almost identically to "detectWallBack".
-
+{
     int mapx = (int)(px) / 64;
     int mapy = 8 - ((int)(py) / 64) - 1;
     if ((mapx >= 0 && mapy >= 0) && (mapx < MAP_X && mapy < MAP_Y) && map[mapy][mapx] == 1)
     {
         glColor3f(1,0,0);
         px += pdx; py += pdy;
-    } 
+    }
 }
 
 void drawPlayer()
@@ -121,20 +94,6 @@ float dist(float ax, float ay, float bx, float by)
 
 void drawRays3D()
 {
-    // This function basically works by checking each grid line (ie index in 2D array map)
-    // for walls and continues to increase the ray's length until a wall is detected.
-    // We do this by first setting (rx, ry) to the nearest grid line from the player based on their angle
-    // and postion (px, py). Then we set the increment/decrement or offset values (rxo, ryo) to their respective
-    // values depending on the players viewing angle. Then as long as the ray's length doesnt go beyond the map's
-    // boundaries (set to 8x's and 8y's in this raycaster) "r_length", we keep offsetting (ie increasing/decreasing)
-    // the values (rx, ry) by their offset values (rxo, ryo) until a wall is encountered.
-    // Then we simply draw the ray from the player's position to the final ray endpoint we reached (rx, ry).
-    // We do this in two seperate checks: a Horizontical grid line check and a Vertical one.
-    // Note: since we only want one ray for each angle (not both the horizontal and vertical at once),
-    // we just need the shorter one of the two (the one which hits the wall first), 
-    // so we find both rays' respective distances and only draw the shorter one.
-    // Note: all 64s are actually BLOCK_SIZE - better to put BLOCK_SIZE instead but 64 looks neater :) -
-
     float rx, ry; // The endpoints our ray
     float rxo, ryo; // The ray's x and y offsets
 
@@ -278,92 +237,4 @@ void drawRays3D()
             glVertex2i(r_count*8 + 530, line_height + line_offset); // The +530 shiftes the scene to the right
         glEnd();
     }
-}
-
-void buttons(unsigned char key, int x, int y)
-{
-    // When 'a' (left) is pressed we rotate the player's angle (his fov - dictated by the ray)
-    // in the counterclockwise direction (because we are using sine and cosine - think of unit circle)
-    // and when 'd' (right) is pressed we rotate in the clockwise direction...
-    // We do so by increasing (a/left) and decreasing (d/right) p_angle when 'a' or 'd' are pressed.
-    // Then the actual movement (or change in position) is only forward and backward (depending on 
-    // where the player is facing).
-    // 'pdx' and 'pdy' are direction vectors (delta x and delta y ie change in x or change in y)
-    // (pdx, pdy) or more like the points on the unit circle.
-    // Like (cos(pi/6), sin(pi/6)) = (sqrt3/2, 1/2) --- check "direction line" in drawPlayer function.
-    // Note: but since the values of sin and cosine are so small (between -1 and 1) then we multiply
-    // pdx and pdy by 5 so that we can actually notice the change.
-    // The actual movement or change in position of the player is basically just an increment
-    // or decrement of by direction vectors ('w' increments - 's' decrements).
-    // So for example if p_angle = pi then pdx = cos(pi)*5 ~= 5 so px += 5 (if 'w')
-    // and pdy = sin(pi)*5 ~= 0.3 so pdy += 0.3 (if 'w').
-
-    if (key == 'w')
-    {
-        px += pdx;
-        py += pdy;
-    }
-    if (key == 's')
-    {
-        px -= pdx;
-        py -= pdy;
-    }
-    if (key == 'd')
-    {
-        p_angle -= 0.1;
-        if (p_angle < 0) p_angle += 2*PI;
-        pdx = cos(p_angle)*speed;
-        pdy = sin(p_angle)*speed;
-    }
-    if (key == 'a')
-    {
-        p_angle += 0.1;
-        if (p_angle > 2*PI) p_angle -= 2*PI;
-        pdx = cos(p_angle)*speed;
-        pdy = sin(p_angle)*speed;
-    }
-    glutPostRedisplay();
-}
-
-void display()
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    drawMap2D();
-    drawRays3D();
-    drawPlayer();
-
-    glutSwapBuffers();
-}
-
-void init()
-{
-    glClearColor(0.2,0.2,0.35,0);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-    glMatrixMode(GL_MODELVIEW);
-
-    px=300; py=300;
-    p_angle = 2*PI;
-    pdx = cos(p_angle)*speed;
-    pdy = sin(p_angle)*speed;
-}
-
-int main(int argc, char** argv)
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-    glutInitWindowPosition(0, 0);
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    glutCreateWindow("Raycaster Game");
-
-    init();
-    glutDisplayFunc(display);
-    glutKeyboardFunc(buttons);
-
-    glutMainLoop();
-    return 0;
 }
