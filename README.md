@@ -41,7 +41,7 @@ Follow these steps to set up the environment on your Windows machine:
    - Copy it to `C:\Windows\SysWOW64\` (for 64-bit systems) or `C:\Windows\System32\` (for 32-bit systems).
 
 ### 3. Compile and Run the Raycaster
-After completing the setup, clone this repository or download the `raycaster.c` file, then compile and run the program:
+After completing the setup, clone this repository then compile and run the program:
 
 - Open a terminal in the project directory and compile the program with:
    ```bash
@@ -59,4 +59,4 @@ After completing the setup, clone this repository or download the `raycaster.c` 
 
 
 
-Note: If you are having trouble with OpenGL, checkout my tutorial [here](https://github.com/DaldeZoo/OpenGL-Tutorials)!
+Note: If you are having trouble with OpenGL, you can checkout my tutorials [here](https://github.com/DaldeZoo/OpenGL-Tutorials)!
